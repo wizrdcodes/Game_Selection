@@ -2,7 +2,7 @@ from utils import check_input, ReturnToMenu
 from games_package import Guessing_Game, Rock_Paper_Scissors, Infinity_Game, Role_Playing_Death_Game
 
 
-print("\nHello! Welcome to the game selection menu. ")
+print("\nHello! Welcome to the game selection menu. Enter 'q' or 'quit' at any time to return to this menu.")
 while True:
     game_selection = input("""Which game would you like to play? 
  \n1) Guessing Game
@@ -20,7 +20,7 @@ while True:
     elif game_selection == "4":
         Role_Playing_Death_Game.role_playing_game()
     elif game_selection == "0":
-        confirm_quit = input("\nAre you sure you want to quit? Yes/Y/0 to quit. ").lower()
+        confirm_quit = input("\nAre you sure you want to quit? Yes/Y/0/Enter to quit. ").lower()
         if confirm_quit == "yes" or "y" or "0":
             print("Quitting now. Thanks for playing!")
             quit()
@@ -33,3 +33,4 @@ while True:
  0) Quit Game Selection""")
     else:
         print("Invalid input. Please try again.")
+
