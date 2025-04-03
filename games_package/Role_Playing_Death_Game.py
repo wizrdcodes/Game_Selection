@@ -106,17 +106,12 @@ def role_playing_game():
         "orb_on_table": True,
         "mushrooms": False,
         "stone_road": False,
-        "howling_sound": False
+        "howling_sound": False,
+        "noise_count": 0
     }
 
 
     def scene_dark_forest():
-        global mushrooms
-        global stone_road
-        global howling_sound
-        mushrooms = False
-        stone_road = False
-        howling_sound = False
         print("\nThe trees whisper as you step forward. The path splits ahead.")
         options = [
             {"description": "Follow the glowing mushrooms.", "handler": scene_glowing_mushrooms},
@@ -271,7 +266,7 @@ def role_playing_game():
 
 
     def scene_turn_back():
-        if mushrooms:
+        if game_state["mushrooms"]:
             print("\nThe glowing mushrooms continue to rapidly grow, as if they do not want you to return from where "
                   "you came.")
             options = [
@@ -279,14 +274,14 @@ def role_playing_game():
                 {"description": "Weave through the mushrooms.", "handler": scene_weave_through_mushrooms}
             ]
             check_and_run_random_handler(options)
-        elif stone_road:
+        elif game_state["stone_road"]:
             print("\nWhen you turn around, the cobblestone path behind you is gone, replaced with thick, bushy trees.")
             options = [
                 {"description": "Continue forward into the forest.", "handler": scene_continue_into_forest},
                 {"description": "Cut down the trees.", "handler": scene_cut_down_trees}
             ]
             check_and_run_random_handler(options)
-        elif howling_sound:
+        elif game_state["howling_sound"]:
             game_over("It's too late...a large wolf comes out of the shadows, bearing its fangs at you...", "beast")
 
 
@@ -313,10 +308,10 @@ def role_playing_game():
             {"description": "Go upstairs to the grand hall.", "handler": scene_grand_hall},
             {"description": "Descend into the dungeon.", "handler": scene_dungeon},
             {"description": "Climb up to the lone tower.", "handler": scene_lone_tower},
-            {"description": "Head down to the hidden library.", "handler": scene_hidden_library}
+            {"description": "Head down to the library.", "handler": scene_library}
         ]
         selected = random.sample(options, 4)
-        upstairs_keywords = ["up", "ascend", "upper", "tower"]
+        upstairs_keywords = ["up", "ascend", "upper", "tower", "upstairs"]
         downstairs_keywords = ["down", "descend", "dungeon", "basement", "cellar", "crypt"]
         upstairs = False; downstairs = False
         for option in selected:
@@ -335,7 +330,7 @@ def role_playing_game():
         else:
             print("\nThe castle looms ahead. You stand at a crossroads.")
 
-        check_and_run_random_handler(selected, 4)
+        check_and_run_random_handler(selected, 2)
 
 
     def scene_grand_hall():
@@ -772,13 +767,95 @@ def role_playing_game():
         game_over("A wizard enters the chamber. He waves his hand upwards, and the fire closes in around you...", "enemy")
 
 
-    def scene_hidden_library():
+    def scene_library():
+        print("\nYou find old bookshelves and candles lining the walls. An old lady sits at a desk in the front of "
+              "the room...")
+        options = [
+            {"description": "Ask the lady if you can check out the library.", "handler": scene_ask_librarian},
+            {"description": "Casually browse the books.", "handler": scene_browse_books},
+            {"description": "Don't let the lady see you...", "handler": scene_avoid_librarian},
+            {"description": "Spy on the lady.", "handler": scene_watch_librarian},
+        ]
+        check_and_run_random_handler(options, 3)
+
+
+    def scene_ask_librarian():
+        game_state["noise_count"] += 1
+        if game_state["noise_count"] >= 2:
+            print("\nA shadow rises from the ground, and morphs into a body. It begins to turn its head left and "
+                  "right...")
+            options = [
+                {"description": ".", "handler": scene_},
+                {"description": ".", "handler": scene_},
+            ]
+            check_and_run_random_handler(options)
+        else:
+            print("\nDespite never having moved, the lady freezes, her body stiff at the sound of your voice. The candles "
+                "flicker...and you hear a faint 'Shhh...' escape her.")
+            options = [
+                {"description": "Don't speak to the librarian...", "handler": scene_stay_quiet},
+                {"description": ".", "handler": scene_},
+                {"description": ".", "handler": scene_},
+            ]
+            check_and_run_random_handler(options, 3)
+
+
+    def scene_stay_quiet():
+        options = [
+            {"description": ".", "handler": scene_},
+            {"description": ".", "handler": scene_},
+        ]
+        check_and_run_random_handler(options)
+
+
+    def scene_browse_books():
+        print("\nAs you look through the library, you look up and notice the lady's desk is empty. The candles "
+              "suddenly feel weaker, as if shadows are overcoming the library...")
+        options = [
+            {"description": ".", "handler": scene_},
+            {"description": ".", "handler": scene_},
+        ]
+        check_and_run_random_handler(options)
+
+
+    def scene_():
         ...
+
+
+    def scene_avoid_librarian():
+        print("\nAs you step away, you step on a pressured plate...and a latch releases a bookcase "
+              "outside the library. The bookcase swing slighty ajar...")
+        options = [
+            {"description": "Enter the secret bookcase...", "handler": scene_enter_bookcase}
+        ]
+        check_and_run_random_handler(options)
+
+
+    def scene_enter_bookcase():
+        print("\nYou discover a hidden library, with scrolls older than the castle itself, and tables with corked "
+              "vials of liquid.")
+        options = [
+            {"description": "Check out the old scrolls.", "handler": scene_see_scrolls},
+            {"description": "Check out the vials of liquid.", "handler": scene_see_vials},
+        ]
+        check_and_run_random_handler(options)
+
+
+    def scene_see_scrolls():
+        ...
+
+
+    def scene_see_vials():
+        ...
+
+
+    def scene_watch_librarian():
+        print("\nThe librarian picks up a book and reads one word, out loud: 'goat'. She then holds the book open towards "
+              "the floor, and a goat emerges from the book's pages. She sets the book down...")
 
 
     def scene_forgotten_cavern():
         print("\nThe cavern is dark and cold. You see two paths ahead.")
-
         options = [
             {"description": "Light a torch and explore deeper.",
              "handler": scene_explore_deeper},
