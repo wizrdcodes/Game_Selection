@@ -1,5 +1,3 @@
-from requests import options
-
 
 def role_playing_game():
     import random
@@ -25,7 +23,9 @@ def role_playing_game():
         "poison": ["Drink a strong antidote.", "Chew on healing herbs.", "Cut off the exposed limb..."],
         "lightning": ["Ground yourself with a metal rod.", "Seek shelter under anything sturdy."],
         "enemy": ["Plead for forgiveness.", "Try to attack one last time.", "Hope for mercy."],
-        "mortal peril": ["Drink a healing potion.", "Pray for a miracle."]
+        "mortal peril": ["Drink a healing potion.", "Pray for a miracle."],
+        "shadow": ["Tell the shadow you'll leave and never come back.", "Strike the shadow.",
+                   "Don't move and hope the shadow leaves you be."]
     }
 
     final_deaths = {
@@ -41,7 +41,7 @@ def role_playing_game():
         "trapped": ["You claw away until exhaustion takes you.",
                     "You sit quietly as darkness consumes you.",
                     "The echoes of your efforts drive you mad."],
-        "ghost": ["The ghost listens...then takes your soul anyway.",
+        "ghost": ["The being listens...then takes your soul anyway.",
                   "The charm glows but shatters. You fade away.",
                   "Earthly things are meaningless. You cross over to the other side.",
                   "You're on your own. You feel your soul fade away."],
@@ -60,7 +60,10 @@ def role_playing_game():
                       "There is no shelter from nature's fury. Electricity surges through you in an instant, "
                       "turning you to ash."],
         "enemy": ["Your words fall on deaf ears.", "It's too late...you've met your peril.", "Your foe shows no mercy."],
-        "mortal peril": ["You didn't pass potions class...", "No one answers your prayers."]
+        "mortal peril": ["You didn't pass potions class...", "No one answers your prayers."],
+        "shadow": ["The shadow grabs you anyway, and you fade into darkness.",
+                   "The blow passes through the shadow, to no effect. It engulfs you in its darkness.",
+                   "The shadow doesn't forget where you are. The moment it touches you, you become a shadow."]
     }
 
     def check_or_return_none():
@@ -104,7 +107,12 @@ def role_playing_game():
         "mushrooms": False,
         "stone_road": False,
         "howling_sound": False,
-        "noise_count": 0
+        "noise_count": 0,
+        "knight_in_library": False,
+        "ask_librarian_first": False,
+        "browse_books_first": False,
+        "continue_browsing": False,
+        "spied_on_librarian": False,
     }
 
     def scene_dark_forest():
@@ -303,7 +311,7 @@ def role_playing_game():
         else:
             print("\nThe castle looms ahead. You stand at a crossroads.")
 
-        check_and_run_random_handler(selected, 2)
+        check_and_run_random_handler(selected, 3)
 
     def scene_grand_hall():
         print("\nYou find dozens of chests filled with treasure next to an empty throne.")
@@ -688,55 +696,122 @@ def role_playing_game():
         game_over("A wizard enters the chamber. He waves his hand upwards, and the fire closes in around you...", "enemy")
 
     def scene_library():
-        print("\nYou find old bookshelves and candles lining the walls. An old lady sits at a desk in the front of "
-              "the room...")
+        print("\nYou find a large, shadowy room, with seemingly no ceiling, lined with old bookshelves, and candles mounted ")
+        print("large distances from each other on the walls. An old lady sits at a desk in the front of the room...")
+        print("A lone hallway looms next to the library entrance, with scattered bookcases built into the walls.")
         options = [
             {"description": "Ask the lady if you can check out the library.", "handler": scene_ask_librarian},
-            {"description": "Casually browse the books.", "handler": scene_browse_books},
-            {"description": "Don't let the lady see you...", "handler": scene_avoid_librarian},
+            {"description": "Casually browse the books.", "handler": scene_start_browsing_books},
+            {"description": "Investigate the hallway...", "handler": scene_hallway},
             {"description": "Spy on the lady.", "handler": scene_watch_librarian},
+        ]
+        check_and_run_random_handler(options, 4)
+
+    def scene_ask_librarian():
+        if not game_state["browse_books_first"]:
+            game_state["ask_librarian_first"] = True
+        game_state["noise_count"] += 1
+        if game_state["noise_count"] >= 2:
+            shadows_descend()
+        else:
+            print("\nShe freezes, her body stiff at the sound of your voice. ")
+            print("The candles flicker...and you hear a faint 'Shhh...' escape her.")
+            if game_state["ask_librarian_first"] == True:
+                options = [
+                    {"description": "Leave the lady alone and browse the books.", "handler": scene_start_browsing_books},
+                    {"description": "Ask the lady again.", "handler": scene_ask_librarian_again},
+                    {"description": "Leave the library and walk down the hallway.", "handler": scene_hallway},
+                ]
+                check_and_run_random_handler(options, 3)
+            elif game_state["browse_books_first"] == True:
+                options = [
+                    {"description": "Continue browsing.", "handler": scene_continue_browsing},
+                    {"description": "Ask the lady again.", "handler": scene_ask_librarian_again},
+                    {"description": "Leave the library and walk down the hallway.", "handler": scene_hallway},
+                ]
+                check_and_run_random_handler(options, 3)
+
+    def scene_ask_librarian_again():
+        game_state["noise_count"] += 1
+        shadows_descend()
+
+    # def scene_stay_quiet():
+    #     options = [
+    #         {"description": ".", "handler": scene_},
+    #         {"description": ".", "handler": scene_},
+    #     ]
+    #     check_and_run_random_handler(options)
+
+    def scene_start_browsing_books():
+        if not game_state["ask_librarian_first"]:
+            game_state["browse_books_first"] = True
+        print("\nAs you start to explore a bookshelf of books, you feel the air displace behind you. ")
+        print("You slowly turn around, and find the lady standing still behind you, a gaunt look on her face. ")
+        print("The candles flicker weakly, as if the shadows above are attempting to overcome the library...")
+        print("The lady whispers, 'Stay quiet'. Then, she slowly turns toward her desk to continue her work.")
+        options = [
+            {"description": "Leave the library and explore the hallway.", "handler": scene_hallway},
+            {"description": "Continue through the library.", "handler": scene_continue_browsing},
+            {"description": "Ask the lady why.", "handler": scene_ask_librarian},
         ]
         check_and_run_random_handler(options, 3)
 
-    def scene_ask_librarian():
-        game_state["noise_count"] += 1
-        if game_state["noise_count"] >= 2:
-            print("\nA shadow rises from the ground, and morphs into a body. It begins to turn its head left and "
-                  "right...")
+    def scene_continue_browsing():
+        game_state["continue_browsing"] = True
+        print("\nAs you stroll through the library, seeking invaluable knowledge, you feel the weight of the shadows above...")
+        if not game_state["spied_on_librarian"]:
             options = [
-                {"description": ".", "handler": scene_},
-                {"description": ".", "handler": scene_},
+                {"description": "Ignore the shadows and spy on the lady.", "handler": scene_watch_librarian},
+                {"description": "Glance up at the shadows.", "handler": scene_glance_at_shadows},
             ]
             check_and_run_random_handler(options)
-        else:
-            print("\nDespite never having moved, the lady freezes, her body stiff at the sound of your voice. The candles "
-                "flicker...and you hear a faint 'Shhh...' escape her.")
+        elif game_state["spied_on_librarian"]:
             options = [
-                {"description": "Don't speak to the librarian...", "handler": scene_stay_quiet},
-                {"description": ".", "handler": scene_},
-                {"description": ".", "handler": scene_},
+                {"description": "Glance up at the shadows.", "handler": scene_glance_at_shadows},
             ]
-            check_and_run_random_handler(options, 3)
+            check_and_run_random_handler(options)
 
-    def scene_stay_quiet():
+    def scene_glance_at_shadows():
+        print("As you glance up, you notice dark movements...")
+        shadows_descend()
+
+    def shadows_descend():
+        print("\nAs if on cue, a shadow pours from the ceiling, dripping onto the ground like black paint. ")
+        print("The shadow morphs into a body, and slowly turns its head left and right. It begins to roam around, ")
+        print("its footsteps silent as it walks..investigating every sound.")
+        if not game_state["continue_browsing"]:
+            options = [
+                {"description": "Don't move...watch the shadow.", "handler": scene_watch_shadow},
+                {"description": "Slowly back away from the shadow...", "handler": scene_back_away_from_shadow},
+            ]
+            check_and_run_random_handler(options)
+        if game_state["continue_browsing"]:
+            options = [
+                {"description": "Slowly back away from the shadow...", "handler": scene_back_away_from_shadow},
+            ]
+            check_and_run_random_handler(options)
+
+    def scene_watch_shadow():
+        if game_state["knight_in_library"]:
+            print("\nAs you watch, the knight's armour clinks away, grabbing the shadow's attention. The shadow ")
+            print("abruptly takes two inhuman, shadowy steps towards the knight, wraps its shadowy hand around him, ")
+            print("and the knight becomes engulfed in darkness.")
+        print("As you watch the shadow, it turns towards you...listening...")
         options = [
-            {"description": ".", "handler": scene_},
-            {"description": ".", "handler": scene_},
+            {"description": "Do not make a sound...", "handler": scene_dont_make_a_sound},
+            {"description": "Slowly back away from the shadow...", "handler": scene_back_away_from_shadow},
         ]
         check_and_run_random_handler(options)
 
-    def scene_browse_books():
-        print("\nAs you look through the library, you look up and notice the lady's desk is empty. The candles "
-              "suddenly feel weaker, as if shadows are overcoming the library...")
-        options = [
-            {"description": ".", "handler": scene_},
-            {"description": ".", "handler": scene_},
-        ]
-        check_and_run_random_handler(options)
+    def scene_back_away_from_shadow():
+        game_over("The shadow hears your footsteps...and steps over to you...darkness gripping you.", "shadow")
 
-    def scene_avoid_librarian():
-        print("\nAs you step away, you step on a pressured plate...and a latch releases a bookcase "
-              "outside the library. The bookcase swing slighty ajar...")
+    def scene_dont_make_a_sound():
+        game_over("The shadow hears you breathing rapidly...and steps over to you...darkness gripping you.", "shadow")
+
+    def scene_hallway():
+        print("\nAs you step down the hallway, you step on a pressured plate...and a latch releases a bookcase. The "
+              "bookcase swings slighty ajar...")
         options = [
             {"description": "Enter the secret bookcase...", "handler": scene_enter_bookcase}
         ]
@@ -758,8 +833,35 @@ def role_playing_game():
         ...
 
     def scene_watch_librarian():
-        print("\nThe librarian picks up a book and reads one word, out loud: 'goat'. She then holds the book open towards "
-              "the floor, and a goat emerges from the book's pages. She sets the book down...")
+        game_state["spied_on_librarian"] = True
+        print("\nThe lady picks up a book and whispers one word from its pages, out loud: 'goat'. ")
+        print("She then holds the book open towards the floor, and a goat emerges from the book's pages. ")
+        print("The lady points at the hallway, and the goat wanders off, down the hallway, and turns out of view. ")
+        print("She sets the book down and picks up another...")
+        if not game_state["continue_browsing"]:
+            options = [
+                {"description": "Walk up to the librarian.", "handler": scene_walk_up_to_librarian},
+                {"description": "Follow the hallway the goat disappeared to.", "handler": scene_hallway},
+            ]
+            check_and_run_random_handler(options)
+        if game_state["continue_browsing"]:
+            options = [
+                {"description": "Ignore the lady. Glance up at the shadows.", "handler": scene_glance_at_shadows},
+                {"description": "Walk up to the librarian.", "handler": scene_walk_up_to_librarian},
+                {"description": "Follow the hallway the goat disappeared to.", "handler": scene_hallway},
+            ]
+            check_and_run_random_handler(options, 3)
+
+    def scene_walk_up_to_librarian():
+        game_state["knight_in_library"] = True
+        print("\nThe librarian whispers another word from another book out loud: 'knight'. Then she holds the book open ")
+        print("towards the floor again, and a knight in full armour emerges from the book's pages. She then notices ")
+        print("you...and whispers, 'Can I help you?'")
+        options = [
+            {"description": "Ask the librarian why she's whispering.", "handler": scene_ask_librarian},
+            {"description": "Ask the librarian about the hallway.", "handler": scene_ask_librarian},
+        ]
+        check_and_run_random_handler(options)
 
     def scene_forgotten_cavern():
         print("\nThe cavern is dark and cold. You see two paths ahead.")

@@ -10,7 +10,8 @@ while True:
 3) Infinity Game
 4) Role Playing Game
 0) Quit Game Selection
-\nType 'Help' or 'H' for help. """).strip().lower()
+\nType 'Help' or 'H' for help. 
+\n> """).strip().lower()
     if game_selection == "1":
         Guessing_Game.guessing_game()
     elif game_selection == "2":
@@ -20,7 +21,8 @@ while True:
     elif game_selection == "4":
         Role_Playing_Death_Game.role_playing_game()
     elif game_selection == "0":
-        confirm_quit = input("\nAre you sure you want to quit? Yes/Y/0/Enter to quit. ").lower()
+        confirm_quit = input("\nAre you sure you want to quit? Yes/Y/0/Enter to quit. "
+                             "\n > ").lower()
         if confirm_quit == "yes" or "y" or "0":
             print("Quitting now. Thanks for playing!")
             quit()
@@ -30,7 +32,8 @@ while True:
  2) Rock Paper Scissors
  3) Infinity Game
  4) Role Playing Game
- 0) Quit Game Selection""")
+ 0) Quit Game Selection
+ \n > """)
     else:
         print("Invalid input. Please try again.")
 
