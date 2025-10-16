@@ -1,9 +1,4 @@
-class ReturnToMenu(Exception):
-    pass
-
-def check_input(prompt):
-    user_input = input(prompt).strip().lower()
-    if user_input in ['q', 'quit']:
-        raise ReturnToMenu
-    return user_input
-
+from .io_helpers import print_wrapped, delayed_input, narrate, set_skip_all
+from .input_handlers import ReturnToMenu, delayed_check_input
+# Preserve the older import style:
+check_input = delayed_check_input

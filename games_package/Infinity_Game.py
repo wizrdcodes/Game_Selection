@@ -1,5 +1,6 @@
 def infinity_game():
     import random
+    from utils import print_wrapped, delayed_input
 
     loop_counter = 0
 
@@ -27,10 +28,11 @@ def infinity_game():
         "i'm positive", "i will", "i would anyway", "i will anyways", "idc", "i dont care", "i don't care"
     ]
 
-    print("\nHello! Welcome to the Infinity Game!")
+    print_wrapped("\nHello! Welcome to the Infinity Game!", newline_delay=1)
+    print_wrapped("Try to exit the game...('Q' or 'Quit' won't work here!)", newline_delay=1)
 
     def input_structure(string):
-        user_response = input(f'{string}\n\n> ').strip().lower()
+        user_response = delayed_input(f'{string}\n\n> ').strip().lower()
         return user_response
 
     while True:
@@ -63,4 +65,4 @@ def infinity_game():
                 if user_input == "0":
                     break  # Return to confirmation sequence
 
-    print("\nOkay! Goodbye!")
+    print_wrapped("\nOkay! Goodbye!", newline_delay=1)
